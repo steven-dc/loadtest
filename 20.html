@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTTP/1.1 vs HTTP/2 – JSON 20 Test</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <h1>HTTP Test – Fetch 20 JSON files</h1>
+  <p>This page fetches 20 JSON files to measure load performance.</p>
+
+  <pre id="output">Loading…</pre>
+
+  <script>
+    const output = document.getElementById('output');
+    const start = performance.now();
+
+    const timestamp = Date.now();
+    const fetches = [];
+
+    for (let i = 1; i <= 20; i++) {
+      fetches.push(fetch(`data/data${i}.json?ts=${timestamp}`).then(r => r.json()));
+    }
+
+    Promise.all(fetches).then(results => {
+      const duration = performance.now() - start;
+      output.textContent = `✅ Fetched 20 JSON files in ${duration.toFixed(2)} ms\n\n` +
+        JSON.stringify(results, null, 2);
+      console.log(`✅ Fetched 20 JSON files in ${duration.toFixed(2)} ms`);
+    }).catch(err => {
+      output.textContent = `❌ Error loading JSON: ${err}`;
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
