@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTTP/1.1 vs HTTP/2 – Image Test</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <h1>HTTP Test – Load Images</h1>
+  <p>This page loads 50KB files .</p>
+
+  <pre id="output">Loading…</pre>
+
+  <h2>50KB Images</h2>
+  <div id="container500" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px;"></div>
+
+
+  <script>
+    const output = document.getElementById('output');
+    const container500 = document.getElementById('container500');
+    const container1m = document.getElementById('container1m');
+    const start = performance.now();
+
+    const uniqueImages = 100;
+    const repeatCount = 100;
+    const total500 = uniqueImages * repeatCount;
+    const timestamp = Date.now();
+
+    let loaded500 = 0;
+
+
+    // Load 200KB images
+    for (let r = 0; r < repeatCount; r++) {
+      for (let i = 1; i <= uniqueImages; i++) {
+        const img = document.createElement('img');
+        img.src = `images/image_50k${i}.jpg?ts=${timestamp}&rep=${r}`;
+        img.alt = `50KB Image ${i} – Repeat ${r + 1}`;
+        img.style.width = '200px';
+        img.style.height = 'auto';
+        img.style.border = '1px solid #ccc';
+
+        img.onload = () => {
+          loaded500++;
+          checkDone();
+        };
+
+        img.onerror = () => {
+          console.error(`❌ Error loading 50KB image ${i} repeat ${r + 1}`);
+        };
+
+        container500.appendChild(img);
+      }
+    }
+
+
+    function checkDone() {
+      if (loaded500 === total500) {
+        const duration = performance.now() - start;
+        output.textContent = `✅ Loaded ${total500} × 50KB  in ${duration.toFixed(2)} ms`;
+        console.log(output.textContent);
+      }
+    }
+  </script>
+</body>
+</html>
