@@ -7,13 +7,15 @@
 </head>
 <body>
   <h1>HTTP Test – Load Images</h1>
-  <p>This page loads 200KB files .</p>
+  <p>This page loads 200KB and 1MB image files to measure performance.</p>
 
   <pre id="output">Loading…</pre>
 
   <h2>200KB Images</h2>
   <div id="container500" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px;"></div>
 
+  <h2>1MB Images</h2>
+  <div id="container1m" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px;"></div>
 
   <script>
     const output = document.getElementById('output');
@@ -21,18 +23,16 @@
     const container1m = document.getElementById('container1m');
     const start = performance.now();
 
-    const uniqueImages = 100;
-    const repeatCount = 10;
-    const total500 = uniqueImages * repeatCount;
-    const total1m = uniqueImages * repeatCount;
-    const timestamp = Date.now();
+    const timestamp = Date.now(); // cache-busting
 
-    let loaded500 = 0;
-    let loaded1m = 0;
+    // 200KB images (100 unique x 10 repeats = 1000)
+    const unique200kb = 100;
+    const repeat200kb = 10;
+    const total200kb = unique200kb * repeat200kb;
+    let loaded200kb = 0;
 
-    // Load 200KB images
-    for (let r = 0; r < repeatCount; r++) {
-      for (let i = 1; i <= uniqueImages; i++) {
+    for (let r = 0; r < repeat200kb; r++) {
+      for (let i = 1; i <= unique200kb; i++) {
         const img = document.createElement('img');
         img.src = `images/image${i}.jpg?ts=${timestamp}&rep=${r}`;
         img.alt = `200KB Image ${i} – Repeat ${r + 1}`;
@@ -41,7 +41,7 @@
         img.style.border = '1px solid #ccc';
 
         img.onload = () => {
-          loaded500++;
+          loaded200kb++;
           checkDone();
         };
 
@@ -53,11 +53,38 @@
       }
     }
 
+    // 1MB images (20 unique x 5 repeats = 100)
+    const unique1mb = 20;
+    const repeat1mb = 5;
+    const total1mb = unique1mb * repeat1mb;
+    let loaded1mb = 0;
+
+    for (let r = 0; r < repeat1mb; r++) {
+      for (let i = 1; i <= unique1mb; i++) {
+        const img = document.createElement('img');
+        img.src = `images/image1m${i}.jpg?ts=${timestamp}&rep=${r}`;
+        img.alt = `1MB Image ${i} – Repeat ${r + 1}`;
+        img.style.width = '200px';
+        img.style.height = 'auto';
+        img.style.border = '1px solid #ccc';
+
+        img.onload = () => {
+          loaded1mb++;
+          checkDone();
+        };
+
+        img.onerror = () => {
+          console.error(`❌ Error loading 1MB image ${i} repeat ${r + 1}`);
+        };
+
+        container1m.appendChild(img);
+      }
+    }
 
     function checkDone() {
-      if (loaded500 === total500 && loaded1m === total1m) {
+      if (loaded200kb === total200kb && loaded1mb === total1mb) {
         const duration = performance.now() - start;
-        output.textContent = `✅ Loaded ${total500} × 200KB  in ${duration.toFixed(2)} ms`;
+        output.textContent = `✅ Loaded ${total200kb} × 200KB and ${total1mb} × 1MB images in ${duration.toFixed(2)} ms`;
         console.log(output.textContent);
       }
     }
